@@ -1,22 +1,25 @@
-﻿# Node.js Demo App: CI/CD with GitHub Actions
+﻿# Task 2: Jenkins Pipeline for CI/CD
 
 ## Objective
-Automate test, build and deploy of a Node.js web app using GitHub Actions and Docker Hub.
+Automate build, test and deploy of a Node.js app using a Jenkins pipeline.
 
 ## Tools
-GitHub, GitHub Actions, Node.js, Express, Docker, Docker Hub
+Jenkins (running in Docker), Docker, GitHub, Node.js
 
-## Pipeline flow
-Triggered on every push to `main`:
-1. **test** job: checkout, setup Node.js 20, `npm install`, `npm test`
-2. **build-and-push** job (runs only if tests pass): login to Docker Hub using secrets, build the Docker image, push it as `nodejs-demo-app:latest`
+## Pipeline stages (Jenkinsfile)
+1. **Build**: builds the Docker image
+2. **Test**: runs the image and verifies the app loads
+3. **Deploy**: removes old container and runs the new one on port 3001
+
+## Trigger
+Poll SCM (`* * * * *`): Jenkins checks the repo every minute and builds on new commits.
+
+## How to run
+1. Start Jenkins: `docker run -d --name jenkins -p 8081:8080 -v jenkins_home:/var/jenkins_home -v //var/run/docker.sock:/var/run/docker.sock --user root jenkins/jenkins:lts-jdk17`
+2. Create a Pipeline job using "Pipeline script from SCM" pointing to this repo.
+3. Click Build Now, then open http://localhost:3001
 
 ## Files
-- `app.js`, `server.js`: Express app
-- `test/app.test.js`: test using Node's built-in test runner
-- `Dockerfile`: container image definition
-- `.github/workflows/main.yml`: CI/CD workflow
-- `screenshots/`: pipeline and Docker Hub screenshots
-
-## Secrets used
-`DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN` (stored in GitHub Actions secrets, not in code)
+- `Jenkinsfile`: pipeline definition
+- `Dockerfile`, `app.js`, `server.js`, `test/`: sample app
+- `screenshots/`: Jenkins dashboard and app screenshots
